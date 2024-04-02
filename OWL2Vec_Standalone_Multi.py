@@ -49,7 +49,7 @@ for file_name in os.listdir(config['BASIC']['ontology_dir']):
         continue
     ONTO_FILE = os.path.join(config['BASIC']['ontology_dir'], file_name)
     print('\nProcessing %s' % file_name)
-    projection = OntologyProjection(ONTO_FILE, reasoner=Reasoner.STRUCTURAL, only_taxonomy=False,
+    projection = OntologyProjection(ONTO_FILE, reasoner=Reasoner[config['DOCUMENT']['axiom_reasoner'], only_taxonomy=False,
                                     bidirectional_taxonomy=True, include_literals=True, avoid_properties=set(),
                                     additional_preferred_labels_annotations=set(),
                                     additional_synonyms_annotations=set(), memory_reasoner='13351')

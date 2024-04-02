@@ -65,7 +65,7 @@ def __perform_ontology_embedding(config):
 
         tax_only = (config['DOCUMENT']['projection_only_taxonomy'] == "yes")
         
-        projection = OntologyProjection(config['BASIC']['ontology_file'], reasoner=Reasoner.STRUCTURAL,
+        projection = OntologyProjection(config['BASIC']['ontology_file'], reasoner=Reasoner[config['DOCUMENT']['axiom_reasoner'],
                                         only_taxonomy=tax_only,
                                         bidirectional_taxonomy=True, include_literals=True, avoid_properties=set(),
                                         additional_preferred_labels_annotations=set(),
@@ -349,7 +349,7 @@ def __perform_joint_ontology_embedding(config):
             continue
         ONTO_FILE = os.path.join(config['BASIC']['ontology_dir'], file_name)
         logging.info('\nProcessing %s' % file_name)
-        projection = OntologyProjection(ONTO_FILE, reasoner=Reasoner.STRUCTURAL, only_taxonomy=False,
+        projection = OntologyProjection(ONTO_FILE, reasoner=Reasoner[config['DOCUMENT']['axiom_reasoner'], only_taxonomy=False,
                                         bidirectional_taxonomy=True, include_literals=True, avoid_properties=set(),
                                         additional_preferred_labels_annotations=set(),
                                         additional_synonyms_annotations=set(), memory_reasoner='13351')

@@ -45,7 +45,7 @@ if ('ontology_projection' in config['DOCUMENT'] and config['DOCUMENT']['ontology
         'pre_entity_file' not in config['DOCUMENT'] or 'pre_axiom_file' not in config['DOCUMENT'] or \
         'pre_annotation_file' not in config['DOCUMENT']:
     print('\n Access the ontology ...')
-    projection = OntologyProjection(config['BASIC']['ontology_file'], reasoner=Reasoner.STRUCTURAL, only_taxonomy=False,
+    projection = OntologyProjection(config['BASIC']['ontology_file'], reasoner=Reasoner[config['DOCUMENT']['axiom_reasoner']], only_taxonomy=False,
                                     bidirectional_taxonomy=True, include_literals=True, avoid_properties=set(),
                                     additional_preferred_labels_annotations=set(),
                                     additional_synonyms_annotations=set(),

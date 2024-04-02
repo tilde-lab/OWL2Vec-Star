@@ -8,6 +8,7 @@ import rdflib
 from rdflib.plugins.sparql import prepareQuery
 import logging
 from enum import Enum
+import traceback
 
 
 class Reasoner(Enum):
@@ -15,6 +16,7 @@ class Reasoner(Enum):
     PELLET=1 #Slow for large ontologies
     STRUCTURAL=2  #Basic domain/range propagation
     NONE=3 #No reasoning
+    FACTXX=4 # FACT++ reasoner (through pyfactxx package)
 
 
 class OntologyAccess(object):
@@ -67,8 +69,10 @@ class OntologyAccess(object):
                     logging.info("Ontology successfully classified.")
                     if unsat > 0:
                         logging.warning("There are " + str(unsat) + " unsatisfiabiable classes.")
-            except:
+
+            except Exception as ex:
                 logging.info("Classifying with Pellet failed.")
+                logging.error(traceback.format_exc())
 
         elif reasoner==Reasoner.HERMIT:
 
@@ -83,10 +87,38 @@ class OntologyAccess(object):
                         if unsat > 0:
                             logging.warning("There are " + str(unsat) + " unsatisfiabiable classes.")
 
-                except:
-
+                except Exception as ex:
                     logging.info("Classifying with HermiT failed.")
+                    logging.error(traceback.format_exc())
 
+        elif reasoner==Reasoner.FACTXX:
+
+                try:
+                    with self.onto:  #it does add inferences to ontology
+                        
+                        logging.info("Classifying ontology with FaCT++...")
+
+                        graph = self.onto.world.as_rdflib_graph()
+                        
+                        from pyfactxx.coras import Coras
+                        
+                        crs = Coras()
+                        crs.add_graph(graph)
+                        crs.parse()
+                        crs.realise()
+                        
+                        triples = crs.query("select ?a ?b ?c where {?a ?b ?c}", scope="inferred");
+                        
+                        for s, p, o in triples:
+                        	if 'http://www.w3.org/2000/01/rdf-schema#subClassOf' not in str(p) or 'http://www.w3.org/2002/07/owl#Thing' not in str(s):
+	                        	graph.add((s, p, o))
+                        
+                        logging.info("Ontology successfully classified.")
+
+                except Exception as ex:
+                    logging.info("Classifying with FaCT++ failed.")
+                    logging.error(traceback.format_exc())
+                    
         ##End Classification
         ####
 
